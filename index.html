@@ -392,6 +392,34 @@
     font-size: 13px;
     color: var(--text-dim);
   }
+  .gate-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: left;
+  }
+  .gate-form label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+  }
+  .gate-form input {
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .gate-error {
+    font-size: 12px;
+    color: var(--accent-ink);
+    min-height: 14px;
+  }
   #appRoot[hidden] { display: none; }
 </style>
 
@@ -408,8 +436,19 @@
       <line x1="6" y1="32" x2="58" y2="32" stroke="var(--text-dim)" stroke-width="1.4" stroke-dasharray="4 3" stroke-linecap="round" opacity="0.8"></line>
     </svg>
     <h1>Beat Loom</h1>
-    <p class="tagline">Tap in to start weaving your loop.</p>
-    <button type="button" class="btn primary" id="gateEnterBtn" style="width:100%; padding:9px 0;">Enter Beat Loom</button>
+    <p class="tagline">Log in to start weaving your loop.</p>
+    <form class="gate-form" id="gateForm">
+      <div>
+        <label for="gateEmail">Email</label>
+        <input type="email" id="gateEmail" autocomplete="username" required />
+      </div>
+      <div>
+        <label for="gatePassword">Password</label>
+        <input type="password" id="gatePassword" autocomplete="current-password" required />
+      </div>
+      <div class="gate-error" id="gateError"></div>
+      <button type="submit" class="btn primary" style="width:100%; padding:9px 0;">Log in</button>
+    </form>
   </div>
 </div>
 
@@ -471,7 +510,7 @@
     <button class="btn" id="deleteBtn">Delete</button>
     <button class="btn" id="newBtn">New</button>
     <span class="spacer"></span>
-    <button class="btn" id="logoutBtn">Exit</button>
+    <button class="btn" id="logoutBtn">Log out</button>
     <span class="toast" id="toast"></span>
   </div>
 
@@ -550,6 +589,14 @@
   ];
   var STORAGE_KEY = 'beatloom_songs_v1';
   var SESSION_KEY = 'beatloom_session_v1';
+
+  // Demo login only: a hardcoded list of accounts checked entirely in this
+  // page. Not real authentication -- anyone with the credentials (or who
+  // reads the page source) can get in. Not shown in the UI on purpose.
+  var DUMMY_ACCOUNTS = {
+    "demo@beatloom.app": "loom123",
+    "guest@beatloom.app": "guest456"
+  };
 
   function emptySteps() { return new Array(STEPS).fill(false); }
   function emptyCells() { return new Array(STEPS).fill(null); }
@@ -1180,17 +1227,19 @@
     toast('Fresh loop ready');
   });
 
-  // ---------- entry gate (no credentials, just a welcome screen) ----------
+  // ---------- login gate (demo credentials, not real auth) ----------
   var gateOverlay = document.getElementById('gateOverlay');
   var appRoot = document.getElementById('appRoot');
+  var gateForm = document.getElementById('gateForm');
+  var gateError = document.getElementById('gateError');
 
-  function hasEntered() {
-    try { return sessionStorage.getItem(SESSION_KEY) === '1'; } catch (e) { return false; }
+  function readSessionEmail() {
+    try { return sessionStorage.getItem(SESSION_KEY); } catch (e) { return null; }
   }
-  function markEntered() {
-    try { sessionStorage.setItem(SESSION_KEY, '1'); } catch (e) {}
+  function writeSessionEmail(email) {
+    try { sessionStorage.setItem(SESSION_KEY, email); } catch (e) {}
   }
-  function clearEntered() {
+  function clearSessionEmail() {
     try { sessionStorage.removeItem(SESSION_KEY); } catch (e) {}
   }
 
@@ -1201,16 +1250,26 @@
   function showGate() {
     appRoot.hidden = true;
     gateOverlay.hidden = false;
+    gateError.textContent = '';
+    gateForm.reset();
   }
 
-  document.getElementById('gateEnterBtn').addEventListener('click', function () {
-    markEntered();
-    showApp();
+  gateForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var email = document.getElementById('gateEmail').value.trim().toLowerCase();
+    var password = document.getElementById('gatePassword').value;
+    if (DUMMY_ACCOUNTS[email] && DUMMY_ACCOUNTS[email] === password) {
+      writeSessionEmail(email);
+      gateError.textContent = '';
+      showApp();
+    } else {
+      gateError.textContent = 'Wrong email or password.';
+    }
   });
 
   document.getElementById('logoutBtn').addEventListener('click', function () {
     stop();
-    clearEntered();
+    clearSessionEmail();
     showGate();
   });
 
@@ -1220,7 +1279,8 @@
     renderAll();
     refreshSongList().catch(function () {});
     initAccountBadge().catch(function () {});
-    if (hasEntered()) {
+    var savedEmail = readSessionEmail();
+    if (savedEmail && DUMMY_ACCOUNTS[savedEmail]) {
       showApp();
     } else {
       showGate();
