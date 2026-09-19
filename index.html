@@ -1,0 +1,1314 @@
+<title>Beat Loom</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f2ece0;
+    --surface: #fffdf9;
+    --surface-2: #eae1cd;
+    --border: #d9cdb2;
+    --text: #241f2e;
+    --text-dim: #726a80;
+    --accent: #ff6a4d;
+    --accent-ink: #a8391f;
+    --playhead: #1f8f80;
+    --track-kick: #ff6a4d;
+    --track-snare: #3d74d6;
+    --track-hihat: #c99417;
+    --track-clap: #9c53c9;
+    --track-bass: #3d74d6;
+    --track-lead: #ff6a4d;
+    --shadow: 0 1px 2px rgba(36,31,46,0.06), 0 6px 16px rgba(36,31,46,0.06);
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #16141d;
+      --surface: #1e1b28;
+      --surface-2: #292534;
+      --border: #3a3446;
+      --text: #f1ecdf;
+      --text-dim: #a49ab4;
+      --accent: #ff8264;
+      --accent-ink: #ffb49c;
+      --playhead: #4fd8c4;
+      --track-kick: #ff8264;
+      --track-snare: #6f9bf0;
+      --track-hihat: #e6b94a;
+      --track-clap: #c283ea;
+      --track-bass: #6f9bf0;
+      --track-lead: #ff8264;
+      --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.35);
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #16141d;
+    --surface: #1e1b28;
+    --surface-2: #292534;
+    --border: #3a3446;
+    --text: #f1ecdf;
+    --text-dim: #a49ab4;
+    --accent: #ff8264;
+    --accent-ink: #ffb49c;
+    --playhead: #4fd8c4;
+    --track-kick: #ff8264;
+    --track-snare: #6f9bf0;
+    --track-hihat: #e6b94a;
+    --track-clap: #c283ea;
+    --track-bass: #6f9bf0;
+    --track-lead: #ff8264;
+    --shadow: 0 1px 2px rgba(0,0,0,0.3), 0 8px 20px rgba(0,0,0,0.35);
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: auto; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', system-ui, sans-serif;
+    padding: 24px 16px 40px;
+    display: flex;
+    justify-content: center;
+  }
+  .app {
+    width: 100%;
+    max-width: 640px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+  header.top {
+    display: flex;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+  .account {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+    flex: none;
+    padding-top: 4px;
+  }
+  .account[hidden] {
+    display: none;
+  }
+  .account img {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    flex: none;
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+  }
+  .account .name {
+    font-size: 12px;
+    color: var(--text-dim);
+    white-space: nowrap;
+  }
+  .account .name strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+  .logo-mark {
+    width: 52px;
+    height: 52px;
+    flex: none;
+    margin-top: 2px;
+  }
+  header.top .heading {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+  }
+  header.top .eyebrow {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 34px;
+    margin: 0;
+    letter-spacing: -0.01em;
+  }
+  header.top p {
+    margin: 2px 0 0;
+    color: var(--text-dim);
+    font-size: 14px;
+    max-width: 46ch;
+  }
+
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 14px 16px;
+  }
+
+  .transport {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 16px;
+  }
+  .play-btn {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    border: none;
+    background: var(--accent);
+    color: #fff;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex: none;
+    transition: transform 0.15s ease;
+  }
+  .play-btn:active { transform: scale(0.92); }
+  .field {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .field label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+  }
+  .field .value {
+    font-family: 'IBM Plex Mono', monospace;
+    font-variant-numeric: tabular-nums;
+    font-size: 12px;
+    color: var(--text);
+  }
+  input[type="range"] {
+    width: 100px;
+    accent-color: var(--accent);
+  }
+  input[type="text"], select {
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .spacer { flex: 1 1 auto; min-width: 8px; }
+  .row-tools {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 16px;
+    align-items: flex-end;
+  }
+  .btn {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    padding: 7px 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .btn:hover { border-color: var(--accent); }
+  .btn.primary {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #fff;
+  }
+  .toast {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--playhead);
+    min-height: 14px;
+  }
+
+  section.track-group {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .group-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .group-head h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 600;
+    font-size: 18px;
+    margin: 0;
+  }
+  .group-head .desc {
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .track {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .track-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    flex: none;
+  }
+  .track-name {
+    font-size: 13px;
+    font-weight: 600;
+    min-width: 58px;
+  }
+  .mini-btn {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    width: 22px;
+    height: 22px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text-dim);
+    cursor: pointer;
+    flex: none;
+  }
+  .mini-btn.active {
+    background: var(--accent-ink);
+    color: #fff;
+    border-color: var(--accent-ink);
+  }
+  .track-bar input[type="range"] { width: 70px; }
+
+  .grid-wrap { overflow-x: auto; }
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(16, 1fr);
+    gap: 3px;
+  }
+  .steps.piano { grid-template-columns: 30px repeat(16, 1fr); }
+  .step {
+    aspect-ratio: 1 / 1;
+    min-width: 16px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    cursor: pointer;
+    padding: 0;
+  }
+  .step[data-beat="1"] { border-left: 2px solid var(--border); }
+  .step.on { border-color: transparent; }
+  .step.playhead { outline: 2px solid var(--playhead); outline-offset: 1px; }
+  .note-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 9px;
+    color: var(--text-dim);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 3px;
+  }
+  .pkey {
+    aspect-ratio: 1 / 1;
+    min-width: 16px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    cursor: pointer;
+    padding: 0;
+  }
+  .pkey.on { border-color: transparent; }
+  .pkey.playhead { outline: 2px solid var(--playhead); outline-offset: 1px; }
+  .pkey[data-beat="1"] { border-left: 2px solid var(--border); }
+
+  footer {
+    font-size: 11.5px;
+    color: var(--text-dim);
+    line-height: 1.5;
+    padding-bottom: 4px;
+  }
+  footer strong { color: var(--text); }
+
+  @media (max-width: 420px) {
+    h1 { font-size: 27px; }
+    .logo-mark { width: 42px; height: 42px; }
+    .track-name { min-width: 46px; font-size: 12px; }
+    .steps.piano { grid-template-columns: 24px repeat(16, 1fr); }
+  }
+
+  .gate-overlay {
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 16px;
+    z-index: 50;
+  }
+  .gate-overlay[hidden] { display: none; }
+  .gate-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    box-shadow: var(--shadow);
+    padding: 28px 24px;
+    width: 100%;
+    max-width: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    text-align: center;
+  }
+  .gate-card .logo-mark { width: 56px; height: 56px; }
+  .gate-card h1 { font-size: 26px; }
+  .gate-card .tagline {
+    margin: -6px 0 0;
+    font-size: 13px;
+    color: var(--text-dim);
+  }
+  .gate-form {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    text-align: left;
+  }
+  .gate-form label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+  }
+  .gate-form input {
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    background: var(--surface-2);
+    color: var(--text);
+  }
+  .gate-error {
+    font-size: 12px;
+    color: var(--accent-ink);
+    min-height: 14px;
+  }
+  .gate-hint {
+    font-size: 11px;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+  .gate-hint code {
+    font-family: 'IBM Plex Mono', monospace;
+    background: var(--surface-2);
+    padding: 1px 4px;
+    border-radius: 4px;
+  }
+  #appRoot[hidden] { display: none; }
+</style>
+
+<div class="gate-overlay" id="gateOverlay">
+  <div class="gate-card">
+    <svg class="logo-mark" viewBox="0 0 64 64" role="img" aria-label="Beat Loom logo">
+      <circle cx="32" cy="32" r="31" fill="var(--surface-2)"></circle>
+      <circle cx="32" cy="32" r="29.5" fill="none" stroke="var(--border)" stroke-width="1.2"></circle>
+      <rect x="6.5" y="23" width="7" height="18" rx="3" fill="var(--accent)"></rect>
+      <rect x="17.5" y="17" width="7" height="30" rx="3" fill="var(--playhead)"></rect>
+      <rect x="28.5" y="21" width="7" height="22" rx="3" fill="var(--accent)"></rect>
+      <rect x="39.5" y="14" width="7" height="36" rx="3" fill="var(--playhead)"></rect>
+      <rect x="50.5" y="19" width="7" height="26" rx="3" fill="var(--accent)"></rect>
+      <line x1="6" y1="32" x2="58" y2="32" stroke="var(--text-dim)" stroke-width="1.4" stroke-dasharray="4 3" stroke-linecap="round" opacity="0.8"></line>
+    </svg>
+    <h1>Beat Loom</h1>
+    <p class="tagline">Log in to start weaving your loop.</p>
+    <form class="gate-form" id="gateForm">
+      <div>
+        <label for="gateEmail">Email</label>
+        <input type="email" id="gateEmail" autocomplete="username" required />
+      </div>
+      <div>
+        <label for="gatePassword">Password</label>
+        <input type="password" id="gatePassword" autocomplete="current-password" required />
+      </div>
+      <div class="gate-error" id="gateError"></div>
+      <button type="submit" class="btn primary" style="width:100%; padding:9px 0;">Log in</button>
+    </form>
+    <p class="gate-hint">Demo login &mdash; a sample account, checked in this page only:<br/><code>demo@beatloom.app</code> / <code>loom123</code></p>
+  </div>
+</div>
+
+<div class="app" id="appRoot" hidden>
+  <header class="top">
+    <svg class="logo-mark" viewBox="0 0 64 64" role="img" aria-label="Beat Loom logo">
+      <circle cx="32" cy="32" r="31" fill="var(--surface-2)"></circle>
+      <circle cx="32" cy="32" r="29.5" fill="none" stroke="var(--border)" stroke-width="1.2"></circle>
+      <rect x="6.5" y="23" width="7" height="18" rx="3" fill="var(--accent)"></rect>
+      <rect x="17.5" y="17" width="7" height="30" rx="3" fill="var(--playhead)"></rect>
+      <rect x="28.5" y="21" width="7" height="22" rx="3" fill="var(--accent)"></rect>
+      <rect x="39.5" y="14" width="7" height="36" rx="3" fill="var(--playhead)"></rect>
+      <rect x="50.5" y="19" width="7" height="26" rx="3" fill="var(--accent)"></rect>
+      <line x1="6" y1="32" x2="58" y2="32" stroke="var(--text-dim)" stroke-width="1.4" stroke-dasharray="4 3" stroke-linecap="round" opacity="0.8"></line>
+    </svg>
+    <div class="heading">
+      <div class="eyebrow">Browser sequencer</div>
+      <h1>Beat Loom</h1>
+      <p>Weave a drum beat, a bassline, and a melody into a 16-step loop, right here in the page.</p>
+    </div>
+    <div class="account" id="accountBadge" hidden>
+      <img id="accountAvatar" alt="" />
+      <span class="name" id="accountName"></span>
+    </div>
+  </header>
+
+  <div class="panel transport">
+    <button class="play-btn" id="playBtn" aria-label="Play">▶</button>
+    <div class="field">
+      <label for="tempo">Tempo</label>
+      <input type="range" id="tempo" min="60" max="180" value="100" />
+    </div>
+    <span class="value" id="tempoValue">100 BPM</span>
+    <div class="field">
+      <label for="master">Master</label>
+      <input type="range" id="master" min="0" max="100" value="80" />
+    </div>
+    <div class="field">
+      <label for="root">Key</label>
+      <select id="root"></select>
+    </div>
+    <div class="field">
+      <label for="scale">Scale</label>
+      <select id="scale"></select>
+    </div>
+  </div>
+
+  <div class="panel row-tools">
+    <div class="field" style="flex:1 1 160px;">
+      <label for="songName">Song name</label>
+      <input type="text" id="songName" value="Untitled loop" />
+    </div>
+    <button class="btn primary" id="saveBtn">Save</button>
+    <div class="field" style="flex:1 1 140px;">
+      <label for="songList">Saved loops</label>
+      <select id="songList"><option value="">— loading —</option></select>
+    </div>
+    <button class="btn" id="loadBtn">Load</button>
+    <button class="btn" id="deleteBtn">Delete</button>
+    <button class="btn" id="newBtn">New</button>
+    <span class="spacer"></span>
+    <button class="btn" id="logoutBtn">Log out</button>
+    <span class="toast" id="toast"></span>
+  </div>
+
+  <section class="track-group panel">
+    <div class="group-head">
+      <h2>Drums</h2>
+      <span class="desc">Four voices, sixteen steps, one groove.</span>
+      <span class="spacer"></span>
+      <button class="btn" id="drumShuffle">Shuffle beat</button>
+      <button class="btn" id="drumClear">Clear</button>
+    </div>
+    <div id="drumTracks"></div>
+  </section>
+
+  <section class="track-group panel">
+    <div class="group-head">
+      <h2>Bass</h2>
+      <span class="desc">One note per step, low end.</span>
+      <span class="spacer"></span>
+      <button class="btn" id="bassShuffle">Shuffle</button>
+      <button class="btn" id="bassClear">Clear</button>
+    </div>
+    <div class="track">
+      <div class="track-bar">
+        <span class="dot" style="background:var(--track-bass)"></span>
+        <span class="track-name">Bass</span>
+        <button class="mini-btn" id="bassMute">M</button>
+        <input type="range" id="bassVol" min="0" max="100" value="80" />
+      </div>
+      <div class="grid-wrap"><div class="steps piano" id="bassGrid"></div></div>
+    </div>
+  </section>
+
+  <section class="track-group panel">
+    <div class="group-head">
+      <h2>Lead</h2>
+      <span class="desc">The melody on top.</span>
+      <span class="spacer"></span>
+      <button class="btn" id="leadShuffle">Shuffle</button>
+      <button class="btn" id="leadClear">Clear</button>
+    </div>
+    <div class="track">
+      <div class="track-bar">
+        <span class="dot" style="background:var(--track-lead)"></span>
+        <span class="track-name">Lead</span>
+        <button class="mini-btn" id="leadMute">M</button>
+        <input type="range" id="leadVol" min="0" max="100" value="70" />
+      </div>
+      <div class="grid-wrap"><div class="steps piano" id="leadGrid"></div></div>
+    </div>
+  </section>
+
+  <footer>
+    <strong>How it works:</strong> click cells to build the pattern, hit play, change key or scale to remix the tune. <strong>Save</strong> stores the loop under its name — tagged with your Claude account, shown at top right — so you and your org can reload it later, even in a different browser or session; if that storage isn't reachable it quietly falls back to saving in this browser only.
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var STEPS = 16;
+  var NOTE_NAMES = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  var SCALES = {
+    minorPentatonic: { label: 'Minor Pentatonic', offsets: [0,3,5,7,10] },
+    majorPentatonic: { label: 'Major Pentatonic', offsets: [0,2,4,7,9] },
+    naturalMinor:    { label: 'Natural Minor', offsets: [0,2,3,5,7,8,10] },
+    major:           { label: 'Major', offsets: [0,2,4,5,7,9,11] },
+    dorian:          { label: 'Dorian', offsets: [0,2,3,5,7,9,10] }
+  };
+  var DRUM_DEFS = [
+    { key: 'kick',  name: 'Kick',   color: 'var(--track-kick)'  },
+    { key: 'snare', name: 'Snare',  color: 'var(--track-snare)' },
+    { key: 'hihat', name: 'Hi-Hat', color: 'var(--track-hihat)' },
+    { key: 'clap',  name: 'Clap',   color: 'var(--track-clap)'  }
+  ];
+  var STORAGE_KEY = 'beatloom_songs_v1';
+  var SESSION_KEY = 'beatloom_session_v1';
+
+  // Demo login only: a hardcoded list of accounts checked entirely in this
+  // page. Not real authentication -- anyone can read this in the page
+  // source. Fine for trying the app out, not for protecting anything real.
+  var DUMMY_ACCOUNTS = {
+    "demo@beatloom.app": "loom123",
+    "guest@beatloom.app": "guest456"
+  };
+
+  function emptySteps() { return new Array(STEPS).fill(false); }
+  function emptyCells() { return new Array(STEPS).fill(null); }
+
+  function defaultState() {
+    return {
+      bpm: 100,
+      master: 80,
+      root: 0,
+      scale: 'minorPentatonic',
+      songName: 'Untitled loop',
+      tracks: {
+        kick:  { steps: [true,false,false,false, true,false,false,false, true,false,false,false, true,false,false,false], vol: 90, mute: false },
+        snare: { steps: [false,false,false,false, true,false,false,false, false,false,false,false, true,false,false,false], vol: 85, mute: false },
+        hihat: { steps: [true,false,true,false, true,false,true,false, true,false,true,false, true,false,true,true], vol: 55, mute: false },
+        clap:  { steps: [false,false,false,false, false,false,false,false, false,false,false,false, true,false,false,false], vol: 70, mute: false },
+        bass:  { cells: [0,null,null,0, null,null,2,null, 3,null,null,3, null,2,null,null], vol: 80, mute: false, rows: 8, baseOctave: 2 },
+        lead:  { cells: [null,null,4,null, 6,null,null,4, null,null,5,null, 3,null,null,null], vol: 70, mute: false, rows: 10, baseOctave: 4 }
+      }
+    };
+  }
+
+  var state = defaultState();
+
+  // ---------- audio engine ----------
+  var audioCtx = null;
+  var masterGain = null;
+  var trackGains = {};
+  var noiseBuffer = null;
+
+  function ensureAudio() {
+    if (!audioCtx) {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      masterGain = audioCtx.createGain();
+      masterGain.gain.value = state.master / 100;
+      masterGain.connect(audioCtx.destination);
+      ['kick','snare','hihat','clap','bass','lead'].forEach(function (key) {
+        var g = audioCtx.createGain();
+        var t = state.tracks[key];
+        g.gain.value = t.mute ? 0 : t.vol / 100;
+        g.connect(masterGain);
+        trackGains[key] = g;
+      });
+      noiseBuffer = audioCtx.createBuffer(1, audioCtx.sampleRate, audioCtx.sampleRate);
+      var data = noiseBuffer.getChannelData(0);
+      for (var i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+    }
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }
+
+  function midiToFreq(midi) { return 440 * Math.pow(2, (midi - 69) / 12); }
+  function midiName(midi) {
+    var n = NOTE_NAMES[((midi % 12) + 12) % 12];
+    var oct = Math.floor(midi / 12) - 1;
+    return n + oct;
+  }
+  function buildScaleNotes(rootIndex, scaleKey, baseOctave, count) {
+    var offsets = SCALES[scaleKey].offsets;
+    var notes = [];
+    var octave = baseOctave;
+    var i = 0;
+    while (notes.length < count) {
+      var offset = offsets[i % offsets.length];
+      var midi = (octave + 1) * 12 + rootIndex + offset;
+      notes.push(midi);
+      i++;
+      if (i % offsets.length === 0) octave++;
+    }
+    return notes;
+  }
+
+  function playKick(time, vol) {
+    var osc = audioCtx.createOscillator();
+    var g = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(150, time);
+    osc.frequency.exponentialRampToValueAtTime(35, time + 0.14);
+    g.gain.setValueAtTime(vol, time);
+    g.gain.exponentialRampToValueAtTime(0.001, time + 0.16);
+    osc.connect(g); g.connect(trackGains.kick);
+    osc.start(time); osc.stop(time + 0.18);
+  }
+  function playSnare(time, vol) {
+    var noise = audioCtx.createBufferSource();
+    noise.buffer = noiseBuffer;
+    var bp = audioCtx.createBiquadFilter();
+    bp.type = 'bandpass'; bp.frequency.value = 1700;
+    var ng = audioCtx.createGain();
+    ng.gain.setValueAtTime(vol, time);
+    ng.gain.exponentialRampToValueAtTime(0.001, time + 0.14);
+    noise.connect(bp); bp.connect(ng); ng.connect(trackGains.snare);
+    noise.start(time); noise.stop(time + 0.14);
+
+    var osc = audioCtx.createOscillator();
+    var og = audioCtx.createGain();
+    osc.type = 'triangle'; osc.frequency.value = 190;
+    og.gain.setValueAtTime(vol * 0.5, time);
+    og.gain.exponentialRampToValueAtTime(0.001, time + 0.09);
+    osc.connect(og); og.connect(trackGains.snare);
+    osc.start(time); osc.stop(time + 0.09);
+  }
+  function playHat(time, vol) {
+    var noise = audioCtx.createBufferSource();
+    noise.buffer = noiseBuffer;
+    var hp = audioCtx.createBiquadFilter();
+    hp.type = 'highpass'; hp.frequency.value = 7500;
+    var g = audioCtx.createGain();
+    g.gain.setValueAtTime(vol * 0.6, time);
+    g.gain.exponentialRampToValueAtTime(0.001, time + 0.045);
+    noise.connect(hp); hp.connect(g); g.connect(trackGains.hihat);
+    noise.start(time); noise.stop(time + 0.05);
+  }
+  function playClap(time, vol) {
+    [0, 0.012, 0.024].forEach(function (offset) {
+      var noise = audioCtx.createBufferSource();
+      noise.buffer = noiseBuffer;
+      var bp = audioCtx.createBiquadFilter();
+      bp.type = 'bandpass'; bp.frequency.value = 1500;
+      var g = audioCtx.createGain();
+      var t = time + offset;
+      g.gain.setValueAtTime(vol * 0.7, t);
+      g.gain.exponentialRampToValueAtTime(0.001, t + 0.08);
+      noise.connect(bp); bp.connect(g); g.connect(trackGains.clap);
+      noise.start(t); noise.stop(t + 0.08);
+    });
+  }
+  function playSynth(time, freq, vol, trackKey, waveform, dur) {
+    var osc = audioCtx.createOscillator();
+    var g = audioCtx.createGain();
+    osc.type = waveform;
+    osc.frequency.value = freq;
+    g.gain.setValueAtTime(0.0001, time);
+    g.gain.exponentialRampToValueAtTime(vol, time + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.001, time + dur);
+    var filter = null;
+    if (waveform === 'sawtooth') {
+      filter = audioCtx.createBiquadFilter();
+      filter.type = 'lowpass';
+      filter.frequency.value = 2200;
+      osc.connect(filter); filter.connect(g);
+    } else {
+      osc.connect(g);
+    }
+    g.connect(trackGains[trackKey]);
+    osc.start(time); osc.stop(time + dur + 0.02);
+  }
+
+  var DRUM_PLAYERS = { kick: playKick, snare: playSnare, hihat: playHat, clap: playClap };
+
+  function scheduleStep(step, time) {
+    DRUM_DEFS.forEach(function (d) {
+      var t = state.tracks[d.key];
+      if (t.steps[step] && !t.mute) DRUM_PLAYERS[d.key](time, t.vol / 100);
+    });
+    var bass = state.tracks.bass;
+    if (bass.cells[step] !== null && !bass.mute) {
+      var bnotes = buildScaleNotes(state.root, state.scale, bass.baseOctave, bass.rows);
+      playSynth(time, midiToFreq(bnotes[bass.cells[step]]), bass.vol / 100, 'bass', 'triangle', 0.28);
+    }
+    var lead = state.tracks.lead;
+    if (lead.cells[step] !== null && !lead.mute) {
+      var lnotes = buildScaleNotes(state.root, state.scale, lead.baseOctave, lead.rows);
+      playSynth(time, midiToFreq(lnotes[lead.cells[step]]), lead.vol / 100, 'lead', 'sawtooth', 0.22);
+    }
+    var delay = Math.max(0, (time - audioCtx.currentTime) * 1000);
+    setTimeout(function () { highlightStep(step); }, delay);
+  }
+
+  var nextStepTime = 0, stepIndex = 0, timerID = null, playing = false;
+  var SCHEDULE_AHEAD = 0.12, LOOKAHEAD_MS = 25;
+
+  function scheduler() {
+    while (nextStepTime < audioCtx.currentTime + SCHEDULE_AHEAD) {
+      scheduleStep(stepIndex, nextStepTime);
+      var secondsPerStep = 60.0 / state.bpm / 4;
+      nextStepTime += secondsPerStep;
+      stepIndex = (stepIndex + 1) % STEPS;
+    }
+    timerID = setTimeout(scheduler, LOOKAHEAD_MS);
+  }
+
+  function start() {
+    ensureAudio();
+    playing = true;
+    stepIndex = 0;
+    nextStepTime = audioCtx.currentTime + 0.05;
+    scheduler();
+    playBtn.textContent = '⏸';
+  }
+  function stop() {
+    playing = false;
+    clearTimeout(timerID);
+    playBtn.textContent = '▶';
+    clearHighlights();
+  }
+
+  // ---------- UI ----------
+  var drumTracksEl = document.getElementById('drumTracks');
+  var bassGridEl = document.getElementById('bassGrid');
+  var leadGridEl = document.getElementById('leadGrid');
+  var playBtn = document.getElementById('playBtn');
+  var tempoInput = document.getElementById('tempo');
+  var tempoValue = document.getElementById('tempoValue');
+  var masterInput = document.getElementById('master');
+  var rootSelect = document.getElementById('root');
+  var scaleSelect = document.getElementById('scale');
+  var songNameInput = document.getElementById('songName');
+  var songListSelect = document.getElementById('songList');
+  var toastEl = document.getElementById('toast');
+  var allStepCells = { kick: [], snare: [], hihat: [], clap: [], bass: [], lead: [] };
+
+  function toast(msg) {
+    toastEl.textContent = msg;
+    setTimeout(function () { if (toastEl.textContent === msg) toastEl.textContent = ''; }, 2200);
+  }
+
+  function highlightStep(step) {
+    Object.keys(allStepCells).forEach(function (key) {
+      allStepCells[key].forEach(function (cell, i) {
+        if (!cell) return;
+        cell.classList.toggle('playhead', i === step);
+      });
+    });
+  }
+  function clearHighlights() {
+    Object.keys(allStepCells).forEach(function (key) {
+      allStepCells[key].forEach(function (cell) { if (cell) cell.classList.remove('playhead'); });
+    });
+  }
+
+  function buildDrumTracks() {
+    drumTracksEl.innerHTML = '';
+    DRUM_DEFS.forEach(function (d) {
+      var t = state.tracks[d.key];
+      var wrap = document.createElement('div');
+      wrap.className = 'track';
+
+      var bar = document.createElement('div');
+      bar.className = 'track-bar';
+      bar.innerHTML =
+        '<span class="dot" style="background:' + d.color + '"></span>' +
+        '<span class="track-name">' + d.name + '</span>';
+      var muteBtn = document.createElement('button');
+      muteBtn.className = 'mini-btn' + (t.mute ? ' active' : '');
+      muteBtn.textContent = 'M';
+      muteBtn.addEventListener('click', function () {
+        t.mute = !t.mute;
+        muteBtn.classList.toggle('active', t.mute);
+        if (trackGains[d.key]) trackGains[d.key].gain.value = t.mute ? 0 : t.vol / 100;
+      });
+      bar.appendChild(muteBtn);
+      var vol = document.createElement('input');
+      vol.type = 'range'; vol.min = 0; vol.max = 100; vol.value = t.vol;
+      vol.addEventListener('input', function () {
+        t.vol = Number(vol.value);
+        if (trackGains[d.key] && !t.mute) trackGains[d.key].gain.value = t.vol / 100;
+      });
+      bar.appendChild(vol);
+      wrap.appendChild(bar);
+
+      var gridWrap = document.createElement('div');
+      gridWrap.className = 'grid-wrap';
+      var grid = document.createElement('div');
+      grid.className = 'steps';
+      allStepCells[d.key] = [];
+      for (var i = 0; i < STEPS; i++) {
+        (function (i) {
+          var btn = document.createElement('button');
+          btn.className = 'step' + (t.steps[i] ? ' on' : '');
+          btn.style.background = t.steps[i] ? d.color : '';
+          if (i % 4 === 0) btn.dataset.beat = '1';
+          btn.addEventListener('click', function () {
+            t.steps[i] = !t.steps[i];
+            btn.classList.toggle('on', t.steps[i]);
+            btn.style.background = t.steps[i] ? d.color : '';
+          });
+          grid.appendChild(btn);
+          allStepCells[d.key][i] = btn;
+        })(i);
+      }
+      gridWrap.appendChild(grid);
+      wrap.appendChild(gridWrap);
+      drumTracksEl.appendChild(wrap);
+    });
+  }
+
+  function buildPianoGrid(container, trackKey, color) {
+    var t = state.tracks[trackKey];
+    var notes = buildScaleNotes(state.root, state.scale, t.baseOctave, t.rows);
+    container.innerHTML = '';
+    allStepCells[trackKey] = [];
+    for (var row = t.rows - 1; row >= 0; row--) {
+      var label = document.createElement('div');
+      label.className = 'note-label';
+      label.textContent = midiName(notes[row]);
+      container.appendChild(label);
+      for (var i = 0; i < STEPS; i++) {
+        (function (row, i) {
+          var on = t.cells[i] === row;
+          var btn = document.createElement('button');
+          btn.className = 'pkey' + (on ? ' on' : '');
+          btn.style.background = on ? color : '';
+          if (i % 4 === 0) btn.dataset.beat = '1';
+          btn.addEventListener('click', function () {
+            t.cells[i] = (t.cells[i] === row) ? null : row;
+            refreshPianoGrid(trackKey);
+          });
+          container.appendChild(btn);
+          if (row === t.cells[i]) allStepCells[trackKey][i] = btn;
+        })(row, i);
+      }
+    }
+  }
+  function refreshPianoGrid(trackKey) {
+    var container = trackKey === 'bass' ? bassGridEl : leadGridEl;
+    var color = trackKey === 'bass' ? 'var(--track-bass)' : 'var(--track-lead)';
+    buildPianoGrid(container, trackKey, color);
+  }
+
+  function populateSelects() {
+    rootSelect.innerHTML = '';
+    NOTE_NAMES.forEach(function (n, i) {
+      var opt = document.createElement('option');
+      opt.value = i; opt.textContent = n;
+      rootSelect.appendChild(opt);
+    });
+    rootSelect.value = state.root;
+    scaleSelect.innerHTML = '';
+    Object.keys(SCALES).forEach(function (key) {
+      var opt = document.createElement('option');
+      opt.value = key; opt.textContent = SCALES[key].label;
+      scaleSelect.appendChild(opt);
+    });
+    scaleSelect.value = state.scale;
+  }
+
+  function renderAll() {
+    tempoInput.value = state.bpm;
+    tempoValue.textContent = state.bpm + ' BPM';
+    masterInput.value = state.master;
+    songNameInput.value = state.songName;
+    populateSelects();
+    buildDrumTracks();
+    document.getElementById('bassVol').value = state.tracks.bass.vol;
+    document.getElementById('leadVol').value = state.tracks.lead.vol;
+    document.getElementById('bassMute').classList.toggle('active', state.tracks.bass.mute);
+    document.getElementById('leadMute').classList.toggle('active', state.tracks.lead.mute);
+    refreshPianoGrid('bass');
+    refreshPianoGrid('lead');
+  }
+
+  // ---------- controls ----------
+  playBtn.addEventListener('click', function () { playing ? stop() : start(); });
+  tempoInput.addEventListener('input', function () {
+    state.bpm = Number(tempoInput.value);
+    tempoValue.textContent = state.bpm + ' BPM';
+  });
+  masterInput.addEventListener('input', function () {
+    state.master = Number(masterInput.value);
+    if (masterGain) masterGain.gain.value = state.master / 100;
+  });
+  rootSelect.addEventListener('change', function () {
+    state.root = Number(rootSelect.value);
+    refreshPianoGrid('bass'); refreshPianoGrid('lead');
+  });
+  scaleSelect.addEventListener('change', function () {
+    state.scale = scaleSelect.value;
+    refreshPianoGrid('bass'); refreshPianoGrid('lead');
+  });
+  songNameInput.addEventListener('input', function () { state.songName = songNameInput.value; });
+
+  document.getElementById('bassMute').addEventListener('click', function () {
+    var t = state.tracks.bass; t.mute = !t.mute;
+    this.classList.toggle('active', t.mute);
+    if (trackGains.bass) trackGains.bass.gain.value = t.mute ? 0 : t.vol / 100;
+  });
+  document.getElementById('leadMute').addEventListener('click', function () {
+    var t = state.tracks.lead; t.mute = !t.mute;
+    this.classList.toggle('active', t.mute);
+    if (trackGains.lead) trackGains.lead.gain.value = t.mute ? 0 : t.vol / 100;
+  });
+  document.getElementById('bassVol').addEventListener('input', function () {
+    state.tracks.bass.vol = Number(this.value);
+    if (trackGains.bass && !state.tracks.bass.mute) trackGains.bass.gain.value = state.tracks.bass.vol / 100;
+  });
+  document.getElementById('leadVol').addEventListener('input', function () {
+    state.tracks.lead.vol = Number(this.value);
+    if (trackGains.lead && !state.tracks.lead.mute) trackGains.lead.gain.value = state.tracks.lead.vol / 100;
+  });
+
+  document.getElementById('drumClear').addEventListener('click', function () {
+    DRUM_DEFS.forEach(function (d) { state.tracks[d.key].steps = emptySteps(); });
+    buildDrumTracks(); toast('Drums cleared');
+  });
+  document.getElementById('drumShuffle').addEventListener('click', function () {
+    state.tracks.kick.steps = randomDrumPattern(0.28, [0,4,8,12]);
+    state.tracks.snare.steps = randomDrumPattern(0.2, [4,12]);
+    state.tracks.hihat.steps = randomDrumPattern(0.55, []);
+    state.tracks.clap.steps = randomDrumPattern(0.12, []);
+    buildDrumTracks(); toast('New beat');
+  });
+  document.getElementById('bassClear').addEventListener('click', function () {
+    state.tracks.bass.cells = emptyCells(); refreshPianoGrid('bass'); toast('Bass cleared');
+  });
+  document.getElementById('bassShuffle').addEventListener('click', function () {
+    state.tracks.bass.cells = randomMelody(state.tracks.bass.rows, 0.4);
+    refreshPianoGrid('bass'); toast('New bassline');
+  });
+  document.getElementById('leadClear').addEventListener('click', function () {
+    state.tracks.lead.cells = emptyCells(); refreshPianoGrid('lead'); toast('Lead cleared');
+  });
+  document.getElementById('leadShuffle').addEventListener('click', function () {
+    state.tracks.lead.cells = randomMelody(state.tracks.lead.rows, 0.55);
+    refreshPianoGrid('lead'); toast('New melody');
+  });
+
+  function randomDrumPattern(density, forceOn) {
+    var arr = emptySteps();
+    for (var i = 0; i < STEPS; i++) arr[i] = Math.random() < density;
+    forceOn.forEach(function (i) { arr[i] = true; });
+    return arr;
+  }
+  function randomMelody(rows, density) {
+    var arr = emptyCells();
+    for (var i = 0; i < STEPS; i++) {
+      if (Math.random() < density) arr[i] = Math.floor(Math.random() * rows);
+    }
+    return arr;
+  }
+
+  // ---------- save / load ----------
+  // Primary store: the `db` capability (persists server-side, survives
+  // reloads/devices/sessions). Falls back to localStorage on this device
+  // only when db isn't available in this view.
+  var dbPromise = null;
+  function getDb() {
+    if (!dbPromise) {
+      dbPromise = (async function () {
+        try {
+          if (window.claude && typeof window.claude.use === 'function') {
+            return await window.claude.use('db');
+          }
+        } catch (e) {}
+        return null;
+      })();
+    }
+    return dbPromise;
+  }
+  function slugify(name) {
+    var s = (name || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+    return s || 'untitled';
+  }
+
+  // ---------- account (who's signed in) ----------
+  var userPromise = null;
+  function getUser() {
+    if (!userPromise) {
+      userPromise = (async function () {
+        try {
+          if (window.claude && typeof window.claude.use === 'function') {
+            return await window.claude.use('user');
+          }
+        } catch (e) {}
+        return null;
+      })();
+    }
+    return userPromise;
+  }
+  async function currentUserId() {
+    var userNS = await getUser();
+    if (!userNS) return null;
+    try { return await userNS.id(); } catch (e) { return null; }
+  }
+  async function initAccountBadge() {
+    var badge = document.getElementById('accountBadge');
+    var avatarEl = document.getElementById('accountAvatar');
+    var nameEl = document.getElementById('accountName');
+    try {
+      var userNS = await getUser();
+      if (!userNS) return;
+      var me = await userNS.me();
+      if (!me || !me.id) return;
+      avatarEl.src = me.avatarUrl;
+      nameEl.innerHTML = '';
+      var strong = document.createElement('strong');
+      strong.textContent = me.isOwner ? 'Kian Agarwal' : (me.name || 'You');
+      nameEl.appendChild(document.createTextNode('Signed in as '));
+      nameEl.appendChild(strong);
+      if (me.isOwner) nameEl.appendChild(document.createTextNode(' · owner'));
+      badge.hidden = false;
+    } catch (e) {}
+  }
+  function readLocalLibrary() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch (e) { return {}; }
+  }
+  function writeLocalLibrary(lib) {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(lib)); } catch (e) {}
+  }
+
+  async function saveSong(name, data) {
+    var db = await getDb();
+    if (db) {
+      var body = {};
+      for (var k in data) body[k] = data[k];
+      body.songName = name;
+      body.savedAt = Date.now();
+      body.savedBy = await currentUserId();
+      await db.collection('songs').doc(slugify(name)).set(body);
+      return true;
+    }
+    var lib = readLocalLibrary();
+    lib[name] = data;
+    writeLocalLibrary(lib);
+    return false;
+  }
+  async function listSongs() {
+    var db = await getDb();
+    if (db) {
+      var snap = await db.collection('songs').orderBy('savedAt', 'desc').get();
+      var docs = snap.docs;
+      var saverIds = [];
+      docs.forEach(function (d) {
+        var sid = (d.data() || {}).savedBy;
+        if (sid && saverIds.indexOf(sid) === -1) saverIds.push(sid);
+      });
+      var saverNames = {};
+      if (saverIds.length) {
+        try {
+          var userNS = await getUser();
+          if (userNS) {
+            var profiles = await userNS.profiles(saverIds);
+            saverIds.forEach(function (id) {
+              saverNames[id] = (profiles[id] && profiles[id].name) || '';
+            });
+          }
+        } catch (e) {}
+      }
+      return docs.map(function (d) {
+        var data = d.data() || {};
+        var label = data.songName || d.id;
+        var saver = data.savedBy && saverNames[data.savedBy];
+        if (saver) label += ' — ' + saver;
+        return { id: d.id, name: label };
+      });
+    }
+    var lib = readLocalLibrary();
+    return Object.keys(lib).map(function (n) { return { id: n, name: n }; });
+  }
+  async function loadSong(id) {
+    var db = await getDb();
+    if (db) {
+      var snap = await db.collection('songs').doc(id).get();
+      return snap.exists ? snap.data() : null;
+    }
+    var lib = readLocalLibrary();
+    return lib[id] || null;
+  }
+  async function deleteSong(id) {
+    var db = await getDb();
+    if (db) { await db.collection('songs').doc(id).delete(); return; }
+    var lib = readLocalLibrary();
+    delete lib[id];
+    writeLocalLibrary(lib);
+  }
+
+  async function refreshSongList() {
+    var list = [];
+    try { list = await listSongs(); } catch (e) {}
+    songListSelect.innerHTML = '';
+    if (!list.length) {
+      var opt = document.createElement('option');
+      opt.value = ''; opt.textContent = '— none saved —';
+      songListSelect.appendChild(opt);
+      return;
+    }
+    list.forEach(function (item) {
+      var opt = document.createElement('option');
+      opt.value = item.id; opt.textContent = item.name;
+      songListSelect.appendChild(opt);
+    });
+  }
+  document.getElementById('saveBtn').addEventListener('click', async function () {
+    var name = state.songName.trim() || 'Untitled loop';
+    state.songName = name;
+    try {
+      var savedRemotely = await saveSong(name, state);
+      await refreshSongList();
+      songListSelect.value = slugify(name);
+      toast(savedRemotely ? 'Saved "' + name + '"' : 'Saved "' + name + '" (this browser only)');
+    } catch (e) {
+      toast('Could not save — try again');
+    }
+  });
+  document.getElementById('loadBtn').addEventListener('click', async function () {
+    var id = songListSelect.value;
+    if (!id) { toast('Pick a saved loop first'); return; }
+    try {
+      var data = await loadSong(id);
+      if (!data) { toast('Could not find that loop'); return; }
+      stop();
+      state = data;
+      renderAll();
+      toast('Loaded "' + (state.songName || id) + '"');
+    } catch (e) {
+      toast('Could not load — try again');
+    }
+  });
+  document.getElementById('deleteBtn').addEventListener('click', async function () {
+    var id = songListSelect.value;
+    if (!id) { toast('Pick a saved loop first'); return; }
+    var label = songListSelect.options[songListSelect.selectedIndex].textContent;
+    try {
+      await deleteSong(id);
+      await refreshSongList();
+      toast('Deleted "' + label + '"');
+    } catch (e) {
+      toast('Could not delete — try again');
+    }
+  });
+  document.getElementById('newBtn').addEventListener('click', function () {
+    stop();
+    state = defaultState();
+    state.songName = 'Untitled loop';
+    renderAll();
+    toast('Fresh loop ready');
+  });
+
+  // ---------- login gate (demo credentials, not real auth) ----------
+  var gateOverlay = document.getElementById('gateOverlay');
+  var appRoot = document.getElementById('appRoot');
+  var gateForm = document.getElementById('gateForm');
+  var gateError = document.getElementById('gateError');
+
+  function readSessionEmail() {
+    try { return sessionStorage.getItem(SESSION_KEY); } catch (e) { return null; }
+  }
+  function writeSessionEmail(email) {
+    try { sessionStorage.setItem(SESSION_KEY, email); } catch (e) {}
+  }
+  function clearSessionEmail() {
+    try { sessionStorage.removeItem(SESSION_KEY); } catch (e) {}
+  }
+
+  function showApp() {
+    gateOverlay.hidden = true;
+    appRoot.hidden = false;
+  }
+  function showGate() {
+    appRoot.hidden = true;
+    gateOverlay.hidden = false;
+    gateError.textContent = '';
+    gateForm.reset();
+  }
+
+  gateForm.addEventListener('submit', function (e) {
+    e.preventDefault();
+    var email = document.getElementById('gateEmail').value.trim().toLowerCase();
+    var password = document.getElementById('gatePassword').value;
+    if (DUMMY_ACCOUNTS[email] && DUMMY_ACCOUNTS[email] === password) {
+      writeSessionEmail(email);
+      gateError.textContent = '';
+      showApp();
+    } else {
+      gateError.textContent = 'Wrong email or password. Try the demo account below.';
+    }
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', function () {
+    stop();
+    clearSessionEmail();
+    showGate();
+  });
+
+  // ---------- boot ----------
+  function boot(initial) {
+    if (initial && initial.tracks) state = initial;
+    renderAll();
+    refreshSongList().catch(function () {});
+    initAccountBadge().catch(function () {});
+    var savedEmail = readSessionEmail();
+    if (savedEmail && DUMMY_ACCOUNTS[savedEmail]) {
+      showApp();
+    } else {
+      showGate();
+    }
+  }
+
+  try {
+    if (window.claude && window.claude.hot && window.claude.hot.snapshot) {
+      window.claude.hot.snapshot(function () { return state; });
+    }
+  } catch (e) {}
+
+  if (window.claude && window.claude.hot && window.claude.hot.ready) {
+    window.claude.hot.ready(function () { boot(window.claude.hot.data); });
+  } else {
+    boot(null);
+  }
+})();
+</script>
